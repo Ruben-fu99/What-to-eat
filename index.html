@@ -1,0 +1,589 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>今天吃什麼 · 扭蛋機</title>
+<style>
+:root{--bg1:#ffe3f1;--bg2:#dcefff;--ink:#3b2a5a;--card:#fff;--line:#3b2a5a;--pink:#ff6fa5;--yellow:#ffd23f;--mint:#5eead4;--sub:#7d6b9e;--dome:rgba(255,255,255,.55);--cap-b:#fff;--mbody:var(--pink);--knobbg:#fff;--slot:#2a1f45;--on-pink:#fff;--on-yellow:#3b2a5a;--on-mint:#3b2a5a;--sh:4px 4px 0 var(--line);--bsh:2px 2px 0 var(--line);--gsh:0 6px 0 var(--line);--gsh-a:0 1px 0 var(--line);--hsh:3px 3px 0 var(--yellow);--tsh:2px 2px 0 var(--line);--mglow:none;--dots:radial-gradient(circle at 20% 20%,rgba(255,255,255,.35) 0 3px,transparent 4px) 0 0/34px 34px;--h1color:var(--ink)}
+*{box-sizing:border-box}
+body{margin:0;color:var(--ink);font-family:"Arial Rounded MT Bold","PingFang TC","Noto Sans TC","Microsoft JhengHei",sans-serif;line-height:1.5;min-height:100vh;background:var(--dots),linear-gradient(160deg,var(--bg1),var(--bg2)) fixed}
+.deco{position:fixed;inset:0;overflow:hidden;pointer-events:none;z-index:0}
+.deco span{position:absolute;opacity:.28;animation:flo 8s ease-in-out infinite alternate}
+@keyframes flo{from{transform:translateY(0) rotate(-8deg)}to{transform:translateY(-26px) rotate(8deg)}}
+.theme-neon .deco span{opacity:.45;filter:drop-shadow(0 0 6px var(--pink))}
+.wrap{max-width:520px;margin:0 auto;padding:18px 16px 56px;position:relative;z-index:1}
+h1{font-size:30px;margin:4px 0 0;text-align:center;font-weight:900;letter-spacing:1px;color:var(--h1color);text-shadow:var(--hsh)}
+.tag{text-align:center;color:var(--sub);font-size:14px;margin-bottom:16px;font-weight:700}
+.hide{display:none!important}
+.card{background:var(--card);border:3px solid var(--line);border-radius:20px;padding:14px 16px;margin-bottom:16px;box-shadow:var(--sh);transition:background-color .4s,border-color .4s}
+h2{font-size:16px;margin:0 0 8px;font-weight:900}
+.row{margin-bottom:12px}.row:last-child{margin-bottom:0}
+.lbl{font-size:13px;color:var(--sub);margin-bottom:6px;font-weight:700}
+.chips{display:flex;flex-wrap:wrap;gap:8px}
+.chip{border:2px solid var(--line);background:var(--card);color:var(--ink);padding:5px 12px;border-radius:999px;font-size:14px;font-weight:700;cursor:pointer;font-family:inherit;box-shadow:var(--bsh)}
+.chip.on{background:var(--yellow);color:var(--on-yellow);transform:translate(1px,1px)}
+.btn{border:2px solid var(--line);background:var(--card);color:var(--ink);padding:8px 14px;border-radius:14px;font-size:14px;font-weight:700;cursor:pointer;text-decoration:none;font-family:inherit;box-shadow:var(--bsh)}
+.btn:active{transform:translate(2px,2px);box-shadow:none}
+.btn.main{background:var(--pink);color:var(--on-pink)}
+.sw{display:flex;align-items:center;gap:8px;font-size:14px;cursor:pointer;font-weight:700}
+.sw input{width:20px;height:20px;accent-color:var(--pink)}
+form{display:flex;gap:8px}
+input[type=text]{flex:1;min-width:0;padding:9px 12px;border-radius:12px;border:2px solid var(--line);background:var(--card);color:var(--ink);font-size:15px;font-family:inherit}
+.list{display:flex;flex-wrap:wrap;gap:6px}
+.pill{background:var(--card);border:2px solid var(--line);border-radius:999px;padding:2px 11px;font-size:13px;font-weight:700}
+.pill button{border:0;background:none;color:var(--sub);cursor:pointer;margin-left:4px;font-size:13px;font-weight:700;font-family:inherit}
+.empty{color:var(--sub);font-size:13px}
+
+/* ===== 扭蛋機 ===== */
+.machine{width:232px;margin:6px auto 0;position:relative}
+.machine.spinning{animation:mshake .13s infinite alternate}
+@keyframes mshake{from{transform:translateX(-3px) rotate(-.6deg)}to{transform:translateX(3px) rotate(.6deg)}}
+.machine::before,.machine::after{content:"";display:none;position:absolute;top:-14px;width:54px;height:54px;border-radius:50%;border:4px solid var(--line);background:radial-gradient(circle at 50% 62%,#ffd1dc 0 34%,var(--pink) 36%)}
+.machine::before{left:10px}.machine::after{right:10px}
+.theme-animal .machine::before,.theme-animal .machine::after{display:block}
+.dome{width:212px;height:190px;margin:0 auto;border:4px solid var(--line);border-radius:106px 106px 18px 18px;background:var(--dome);position:relative;z-index:1;overflow:hidden;box-shadow:var(--mglow)}
+.caps{position:absolute;inset:0}
+.c{position:absolute;width:44px;height:44px;border-radius:50%;border:3px solid var(--line);background:linear-gradient(180deg,var(--c) 50%,var(--cap-b) 50%);transform:rotate(var(--r));display:grid;place-items:center;font-size:20px;line-height:1}
+.spinning .c{animation:jig .22s infinite alternate;animation-delay:var(--d)}
+@keyframes jig{from{transform:translateY(0) rotate(var(--r))}to{transform:translateY(-26px) rotate(calc(var(--r) + 50deg))}}
+.shine{position:absolute;left:22px;top:20px;width:40px;height:78px;border-left:7px solid rgba(255,255,255,.85);border-radius:50%;transform:rotate(18deg);pointer-events:none}
+.mbody{width:232px;height:152px;margin-top:-4px;background:var(--mbody);border:4px solid var(--line);border-radius:20px 20px 30px 30px;position:relative;z-index:1;box-shadow:var(--mglow)}
+.mlabel{position:absolute;top:10px;left:0;right:0;text-align:center;font-weight:900;color:#fff;font-size:18px;letter-spacing:1px;text-shadow:var(--tsh);white-space:nowrap}
+.knobwrap{position:absolute;left:24px;top:50px;width:72px;height:72px;border-radius:50%;background:var(--knobbg);border:4px solid var(--line);display:grid;place-items:center;cursor:pointer;box-shadow:0 4px 0 var(--line)}
+.knobwrap:active{transform:translateY(3px);box-shadow:0 1px 0 var(--line)}
+.knob{width:54px;height:15px;background:var(--yellow);border:3px solid var(--line);border-radius:8px}
+.spinning .knob{animation:rot 1.2s ease-in-out}
+@keyframes rot{to{transform:rotate(720deg)}}
+.slot{position:absolute;right:22px;bottom:16px;width:82px;height:50px;background:var(--slot);border:4px solid var(--line);border-radius:12px 12px 26px 26px}
+.mfoot{width:248px;height:14px;background:var(--line);border-radius:0 0 12px 12px;margin:0 auto;position:relative;z-index:1}
+
+/* ===== 結果扭蛋 ===== */
+.stage{text-align:center;padding:10px 12px 18px;margin-top:2px}
+.out{height:170px;position:relative;display:grid;place-items:center}
+.cap{width:110px;height:110px;position:relative}
+.cap.away{opacity:0}
+.cap.noanim *{transition:none!important}
+.cap .h{position:absolute;left:0;width:110px;height:55px;border:4px solid var(--line);z-index:1;transition:transform .5s cubic-bezier(.3,1.6,.5,1)}
+.cap .t{top:0;border-radius:55px 55px 0 0;background:var(--cc,#ff6fa5);border-bottom-width:2px}
+.cap .b{bottom:0;border-radius:0 0 55px 55px;background:var(--cap-b);border-top-width:2px}
+.cap .em{position:absolute;inset:0;display:grid;place-items:center;font-size:58px;transform:scale(0);transition:transform .45s .12s cubic-bezier(.3,1.8,.5,1);z-index:0}
+.cap .q{position:absolute;inset:0;display:grid;place-items:center;font-size:40px;font-weight:900;color:#fff;z-index:2;text-shadow:2px 2px 0 var(--line);padding-bottom:30px}
+.cap.open .t{transform:translate(-30px,-48px) rotate(-38deg)}
+.cap.open .b{transform:translate(30px,20px) rotate(28deg)}
+.cap.open .em{transform:scale(1);z-index:3}
+.cap.open .q{display:none}
+.cap.drop{animation:dropin .85s cubic-bezier(.3,1.2,.5,1)}
+@keyframes dropin{0%{transform:translate(70px,-230px) rotate(-140deg);opacity:0}12%{opacity:1}55%{transform:translate(0,0) rotate(18deg)}75%{transform:translate(0,-22px) rotate(-8deg)}100%{transform:translate(0,0) rotate(0)}}
+.theme-neon .cap .h{box-shadow:0 0 10px var(--line)}
+.cf{position:absolute;left:50%;top:50%;width:10px;height:10px;border-radius:3px;border:2px solid var(--line);animation:cf .95s ease-out forwards;pointer-events:none}
+@keyframes cf{to{transform:translate(var(--dx),var(--dy)) rotate(540deg);opacity:0}}
+.name{font-size:32px;font-weight:900;margin:4px 0 0;min-height:46px}
+.theme-neon .name{text-shadow:0 0 10px var(--pink)}
+.meta{color:var(--sub);font-size:14px;min-height:21px;font-weight:700}
+.note{color:var(--pink);font-size:13px;min-height:19px;margin-top:2px;font-weight:700}
+.theme-neon .note{color:var(--yellow)}
+
+/* 科技風 */
+.theme-tech{font-family:"SF Mono","Menlo","Consolas","PingFang TC","Noto Sans TC","Microsoft JhengHei",monospace}
+.theme-tech .card,.theme-tech .chip,.theme-tech .btn,.theme-tech .go,.theme-tech .pill,.theme-tech input[type=text],.theme-tech .sq{border-radius:6px}
+.theme-tech .card{position:relative}
+.theme-tech .card::before,.theme-tech .card::after{content:"";position:absolute;width:14px;height:14px;border:3px solid #00e5ff;pointer-events:none}
+.theme-tech .card::before{top:-5px;left:-5px;border-right:0;border-bottom:0}
+.theme-tech .card::after{bottom:-5px;right:-5px;border-left:0;border-top:0}
+.theme-tech h1{letter-spacing:3px}
+.theme-tech .tag::after{content:"_";animation:blink 1s steps(1) infinite}
+@keyframes blink{50%{opacity:0}}
+.theme-tech .dome{border-radius:106px 106px 8px 8px}
+.theme-tech .mbody{border-radius:8px 8px 14px 14px}
+.theme-tech .mlabel{color:#e6fbff;letter-spacing:3px;font-size:16px}
+.theme-tech .dome::after{content:"";position:absolute;left:0;right:0;top:-40px;height:40px;background:linear-gradient(180deg,transparent,rgba(0,229,255,.4),transparent);animation:scan 2.4s linear infinite;z-index:3;pointer-events:none}
+@keyframes scan{to{top:100%}}
+.theme-tech .cap .h{box-shadow:0 0 10px var(--line)}
+.theme-tech .name{text-shadow:0 0 10px #00e5ff}
+.theme-tech .note{color:var(--mint)}
+.theme-tech .deco span{opacity:.3;filter:drop-shadow(0 0 6px #00e5ff)}
+.acts{display:flex;gap:8px;margin-top:12px;flex-wrap:wrap;justify-content:center}
+
+.go{width:100%;border:3px solid var(--line);background:var(--yellow);color:var(--on-yellow);font-size:22px;font-weight:900;padding:14px;border-radius:18px;cursor:pointer;font-family:inherit;margin:8px 0 16px;box-shadow:var(--gsh)}
+.go:active{transform:translateY(5px);box-shadow:var(--gsh-a)}
+.go:disabled{opacity:.7}
+
+/* 霓虹閃爍 */
+.theme-neon h1,.theme-neon .mlabel{animation:flick 4.5s infinite}
+@keyframes flick{0%,18%,22%,25%,53%,57%,100%{opacity:1}20%,24%,55%{opacity:.5}}
+
+/* 投票 */
+.opt{display:flex;align-items:center;gap:8px;padding:8px 0;border-bottom:2px dashed var(--line)}
+.opt:last-of-type{border-bottom:0}
+.opt .on{flex:1;font-size:16px;font-weight:700}
+.cnt{min-width:26px;text-align:center;font-weight:900;font-size:20px}
+.sq{width:36px;height:36px;border-radius:10px;border:2px solid var(--line);background:var(--mint);color:var(--on-mint);font-size:18px;font-weight:900;cursor:pointer;font-family:inherit;box-shadow:var(--bsh)}
+.sq:active{transform:translate(2px,2px);box-shadow:none}
+.vbtn{display:block;width:100%;text-align:left;margin-bottom:8px;padding:12px 14px;font-size:16px}
+.vbtn.sel{background:var(--pink);color:var(--on-pink)}
+</style>
+</head>
+<body>
+<div class="deco" id="deco"></div>
+<div class="wrap">
+  <h1 id="title">🎰 今天吃什麼</h1>
+  <div class="tag" id="tag">轉一顆扭蛋，決定你的下一餐！</div>
+
+  <!-- 受邀投票模式（網址帶有 #vote= 時顯示） -->
+  <div class="card hide" id="voter">
+    <h2>🗳️ 朋友邀你投票：吃什麼？</h2>
+    <div id="vopts"></div>
+    <button class="btn main hide" id="vsend" style="width:100%;margin-top:4px">把我的投票傳回去</button>
+  </div>
+
+  <!-- 扭蛋機 -->
+  <div class="machine" id="machine">
+    <div class="dome"><div class="caps" id="caps"></div><div class="shine"></div></div>
+    <div class="mbody">
+      <div class="mlabel" id="mlabel">吃什麼？</div>
+      <div class="knobwrap" id="knobwrap"><div class="knob"></div></div>
+      <div class="slot"></div>
+    </div>
+    <div class="mfoot"></div>
+  </div>
+
+  <div class="card stage" id="stage">
+    <div class="out" id="out">
+      <div class="cap" id="cap">
+        <div class="em" id="emoji"></div>
+        <div class="h t"></div><div class="h b"></div>
+        <div class="q" id="qmark">?</div>
+      </div>
+    </div>
+    <div class="name" id="name">轉動旋鈕試試手氣</div>
+    <div class="meta" id="meta"></div>
+    <div class="note" id="note"></div>
+    <div class="acts">
+      <button class="btn main hide" id="eat">✅ 就吃這個</button>
+      <button class="btn hide" id="again">再轉一次</button>
+      <button class="btn hide" id="ban">不要這個</button>
+      <button class="btn hide" id="share">📤 分享</button>
+      <a class="btn hide" id="map" target="_blank" rel="noopener">📍 找附近店家</a>
+    </div>
+  </div>
+
+  <button class="go" id="go">🎲 轉扭蛋！</button>
+
+  <div class="card">
+    <h2>🎛️ 轉蛋條件</h2>
+    <div class="row"><div class="lbl">餐別</div><div class="chips" id="fMeal"></div></div>
+    <div class="row"><div class="lbl">預算</div><div class="chips" id="fPrice"></div></div>
+    <div class="row"><div class="lbl">心情</div><div class="chips" id="fMood"></div></div>
+    <div class="row"><label class="sw"><input type="checkbox" id="avoid" checked> 避免連吃同類型（近 3 天已吃過 2 天的類型先跳過）</label></div>
+  </div>
+
+  <div class="card">
+    <h2>🎨 機台風格（可固定）</h2>
+    <div class="chips" id="fMode"></div>
+    <div class="empty" id="modeNote" style="margin-top:8px"></div>
+  </div>
+
+  <div class="card">
+    <h2>👥 揪朋友投票</h2>
+    <div class="empty" style="margin-bottom:8px">轉出 3 個候選，分享給朋友；朋友回覆後在這裡幫他們記票，最後公布結果。</div>
+    <button class="btn main" id="vmake">產生 3 個候選</button>
+    <div id="vbox" class="hide" style="margin-top:10px">
+      <div id="vlist"></div>
+      <div class="acts" style="justify-content:flex-start">
+        <button class="btn" id="vshare">📤 分享投票</button>
+        <button class="btn main" id="vend">🏆 公布結果</button>
+      </div>
+      <div class="note" id="vres"></div>
+    </div>
+  </div>
+
+  <div class="card">
+    <h2>📒 吃過紀錄</h2>
+    <div class="list" id="hist"></div>
+  </div>
+
+  <div class="card">
+    <h2>➕ 新增我愛吃的</h2>
+    <form id="addForm"><input type="text" id="addIn" placeholder="例如：巷口那家滷肉飯" maxlength="20"><button class="btn" type="submit">加入</button></form>
+    <div class="empty" style="margin-top:6px">自訂項目不受篩選與類型限制，各種風格的扭蛋都有機會抽到</div>
+    <div class="list" id="custom" style="margin-top:8px"></div>
+  </div>
+
+  <div class="card">
+    <h2>🚫 已排除（不想吃）</h2>
+    <div class="list" id="blocked"></div>
+  </div>
+</div>
+
+<script>
+// [名稱, emoji, 餐別(b早 l午 d晚 n宵), 價位(1<100 2:100-250 3:250+), 心情, 類型, 國家]
+const FOODS=[
+["蛋餅","🥞","b",1,"療癒 快速","早點","TW"],["燒餅油條","🥖","b",1,"療癒","早點","TW"],["飯糰","🍙","bl",1,"快速","飯類","TW"],["三明治","🥪","bl",1,"清爽 快速","早點","US"],
+["鐵板麵","🍝","bl",1,"重口味","麵食","TW"],["蘿蔔糕","🍘","b",1,"療癒","早點","TW"],["豆漿＋饅頭","🥛","b",1,"清爽","早點","TW"],["蛋吐司","🍞","b",1,"快速","早點","TW"],
+["滷肉飯","🍚","ldn",1,"療癒 快速","飯類","TW"],["雞肉飯","🍗","ld",1,"療癒 快速","飯類","TW"],["排骨便當","🍱","ld",2,"重口味","飯類","TW"],["牛肉麵","🍜","ld",2,"療癒","麵食","TW"],
+["水餃","🥟","ldn",1,"快速","餃點","TW"],["鍋貼","🥟","ldn",1,"快速 重口味","餃點","TW"],["乾麵＋燙青菜","🍜","ld",1,"清爽","麵食","TW"],["控肉飯","🍖","ld",2,"重口味","飯類","TW"],
+["咖哩飯","🍛","ld",2,"療癒 重口味","飯類","JP"],["日式丼飯","🍲","ld",2,"犒賞","日式","JP"],["拉麵","🍜","ld",2,"重口味 療癒","麵食","JP"],["壽司","🍣","ld",3,"犒賞 清爽","日式","JP"],
+["沙拉輕食","🥗","l",2,"清爽","輕食","US"],["健康餐盒","🥙","ld",2,"清爽","輕食","TW"],["義大利麵","🍝","ld",2,"犒賞","西式","IT"],["披薩","🍕","ldn",2,"重口味 犒賞","西式","IT"],
+["漢堡","🍔","ldn",2,"重口味 快速","西式","US"],["泰式料理","🍤","ld",2,"重口味","異國","TH"],["韓式炸雞","🍗","dn",2,"重口味 犒賞","炸烤","KR"],["部隊鍋","🍲","dn",2,"療癒 重口味","鍋物","KR"],
+["小火鍋","🍲","ld",2,"療癒","鍋物","TW"],["麻辣火鍋","🌶️","d",3,"重口味 犒賞","鍋物","TW"],["燒肉","🥩","d",3,"犒賞","肉類","JP"],["牛排","🥩","d",3,"犒賞","肉類","US"],
+["居酒屋","🍢","dn",3,"犒賞","日式","JP"],["鹹酥雞","🍗","dn",1,"重口味","炸烤","TW"],["滷味","🍢","dn",2,"重口味 快速","炸烤","TW"],["臭豆腐","🍲","dn",1,"重口味","炸烤","TW"],
+["鹽酥雞＋啤酒","🍺","n",2,"犒賞","炸烤","TW"],["麥當勞","🍟","ldn",1,"快速 重口味","西式","US"],["便利商店","🏪","bldn",1,"快速","便利商店","TW"],["粥品","🥣","bn",1,"療癒 清爽","飯類","TW"],
+["蚵仔煎","🍳","dn",1,"重口味","炸烤","TW"],["燒烤","🍖","n",2,"重口味 犒賞","炸烤","TW"],["珍珠奶茶＋雞排","🧋","dn",1,"犒賞","炸烤","TW"],["甜點店","🍰","ln",2,"犒賞 療癒","甜點","FR"],
+["素食自助餐","🥬","ld",1,"清爽","輕食","TW"],["越南河粉","🍜","ld",2,"清爽","麵食","VN"],["港式飲茶","🥟","ld",3,"犒賞","餃點","TW"],
+["韓式拌飯","🍚","ld",2,"療癒 清爽","飯類","KR"],["韓式烤肉","🥩","d",3,"犒賞 重口味","肉類","KR"],["辣炒年糕","🍢","ldn",1,"重口味 快速","炸烤","KR"],
+["燉飯","🍚","ld",2,"犒賞 療癒","飯類","IT"],["千層麵","🍝","ld",2,"療癒","麵食","IT"],
+["打拋豬飯","🍳","ld",2,"重口味 快速","飯類","TH"],["泰式綠咖哩","🍛","ld",2,"重口味 療癒","飯類","TH"],["芒果糯米飯","🥭","ln",2,"犒賞 清爽","甜點","TH"],
+["墨西哥塔可","🌮","ldn",2,"重口味 快速","異國","MX"],["墨西哥捲餅","🌯","ld",2,"快速 重口味","異國","MX"],
+["法式料理","🍷","d",3,"犒賞","異國","FR"],["可頌三明治","🥐","bl",2,"清爽 快速","早點","FR"],["法式吐司","🍞","b",2,"犒賞 療癒","早點","FR"],["法式鹹派","🥧","l",2,"清爽","異國","FR"],
+["印度咖哩","🍛","ld",2,"重口味 療癒","異國","IN"],["坦都里烤雞","🍗","d",2,"重口味","炸烤","IN"],
+["熱狗","🌭","ldn",1,"快速 重口味","西式","US"],["BBQ 烤肋排","🍖","d",3,"犒賞","肉類","US"],["美式鬆餅","🥞","b",2,"犒賞","早點","US"],
+["越式法國麵包","🥖","bl",1,"快速 清爽","早點","VN"],["越南春捲","🥗","ld",1,"清爽","輕食","VN"],
+["烏龍麵","🍜","ld",2,"療癒","麵食","JP"],["天婦羅定食","🍤","ld",2,"犒賞","日式","JP"],["日式定食","🍱","ld",2,"清爽","日式","JP"],["章魚燒","🐙","ldn",1,"快速","炸烤","JP"]
+];
+const MEALS={"":"不限",b:"早餐",l:"午餐",d:"晚餐",n:"宵夜"};
+const PRICES={0:"不限",1:"$ 100內",2:"$$ 100-250",3:"$$$ 250+"};
+const MOODS=["不限","療癒","清爽","重口味","快速","犒賞"];
+const PN={1:"$ 平價",2:"$$ 中等",3:"$$$ 犒賞"};
+const RAR={1:"普通 ⭐",2:"稀有 ⭐⭐",3:"超稀有 ⭐⭐⭐"};
+
+/* ================= 主題 ================= */
+const BASE={"--bg1":"#ffe3f1","--bg2":"#dcefff","--ink":"#3b2a5a","--card":"#ffffff","--line":"#3b2a5a","--pink":"#ff6fa5","--yellow":"#ffd23f","--mint":"#5eead4","--sub":"#7d6b9e","--dome":"rgba(255,255,255,.55)","--cap-b":"#ffffff","--mbody":"var(--pink)","--knobbg":"#ffffff","--slot":"#2a1f45","--on-pink":"#ffffff","--on-yellow":"#3b2a5a","--on-mint":"#3b2a5a","--sh":"4px 4px 0 var(--line)","--bsh":"2px 2px 0 var(--line)","--gsh":"0 6px 0 var(--line)","--gsh-a":"0 1px 0 var(--line)","--hsh":"3px 3px 0 var(--yellow)","--tsh":"2px 2px 0 var(--line)","--mglow":"none","--dots":"radial-gradient(circle at 20% 20%,rgba(255,255,255,.35) 0 3px,transparent 4px) 0 0/34px 34px","--h1color":"var(--ink)"};
+const isDark=!!(window.matchMedia&&matchMedia("(prefers-color-scheme: dark)").matches);
+const ANIMALS=["🐶","🐱","🐰","🐻","🐼","🐥","🐷","🐸","🦊","🐨"];
+const T={};
+T.classic={name:"🎰 經典",icon:"🎰",label:"吃什麼？",tag:"轉一顆扭蛋，決定你的下一餐！",
+  vars:isDark?{"--bg1":"#241a42","--bg2":"#10253d","--ink":"#fbeaff","--card":"#2b2250","--line":"#9a8cf0","--sub":"#b9a9e6","--dome":"rgba(255,255,255,.12)"}:{},
+  cols:["#ff6fa5","#ffd23f","#5ec2ff","#a78bfa","#5eead4","#ff9f5a"],deco:["🍜","🍣","🍕","🍔","🥟","🍰","🧋"],q:"?"};
+T.animal={name:"🐻 可愛動物",icon:"🐻",label:"🐾 吃什麼呀？",tag:"小動物們幫你選早餐～",animals:true,
+  vars:{"--bg1":"#fff1d6","--bg2":"#ffe0ea","--ink":"#5a3a2a","--card":"#fffdf6","--line":"#8a5a3c","--pink":"#ffa6c1","--yellow":"#ffe066","--mint":"#9be3b4","--sub":"#a1806a","--dome":"rgba(255,252,240,.85)","--on-pink":"#5a3a2a","--on-yellow":"#5a3a2a","--on-mint":"#5a3a2a","--hsh":"3px 3px 0 #ffa6c1"},
+  cols:["#ffa6c1","#ffe066","#9be3b4","#a5d8ff","#ffc78e","#d9b8ff"],deco:ANIMALS.concat(["🐾","🌼"]),q:"🐾"};
+T.neon={name:"🌙 霓虹宵夜",icon:"🌙",label:"NIGHT SNACK",tag:"夜深了…來點宵夜？",
+  vars:{"--bg1":"#07031a","--bg2":"#16093f","--ink":"#e9f7ff","--card":"#150c33","--line":"#27f3ff","--pink":"#ff2bd6","--yellow":"#27f3ff","--mint":"#b6ff3d","--sub":"#a9a3ff","--dome":"rgba(90,70,220,.18)","--cap-b":"#150b3a","--mbody":"#1c0d45","--knobbg":"#0b0630","--slot":"#000000","--on-pink":"#12002e","--on-yellow":"#07031a","--on-mint":"#07031a","--sh":"0 0 10px var(--line), inset 0 0 12px rgba(39,243,255,.12)","--bsh":"0 0 8px var(--line)","--gsh":"0 0 20px var(--yellow), 0 5px 0 #0a7c85","--gsh-a":"0 0 8px var(--yellow)","--hsh":"0 0 6px #fff, 0 0 16px #ff2bd6, 0 0 34px #ff2bd6","--tsh":"0 0 6px #fff, 0 0 14px #ff2bd6, 0 0 26px #ff2bd6","--mglow":"0 0 14px var(--line), inset 0 0 18px rgba(255,43,214,.3)","--dots":"repeating-linear-gradient(0deg,rgba(255,255,255,.035) 0 1px,transparent 1px 4px)","--h1color":"#ffffff"},
+  cols:["#ff2bd6","#27f3ff","#b6ff3d","#ffe14d","#9b5cff","#ff6a3d"],deco:["✨","🌙","⭐","🍢","🍗","🍺","🍜"],q:"?"};
+T.tech={name:"🤖 科技",icon:"🤖",label:"FOOD.EXE",tag:"AI 運算中，為你鎖定今日最佳餐點",
+  vars:{"--bg1":"#030a1a","--bg2":"#0a1a33","--ink":"#dff6ff","--card":"#08142b","--line":"#00e5ff","--pink":"#3d7bff","--yellow":"#00e5ff","--mint":"#00ff9d","--sub":"#7fa3c7","--dome":"rgba(0,229,255,.08)","--cap-b":"#0a1428","--mbody":"linear-gradient(180deg,#0e2142,#071226)","--knobbg":"#061024","--slot":"#000814","--on-pink":"#ffffff","--on-yellow":"#021018","--on-mint":"#021018","--sh":"0 0 14px rgba(0,229,255,.35), inset 0 0 14px rgba(0,229,255,.08)","--bsh":"0 0 6px rgba(0,229,255,.6)","--gsh":"0 0 18px rgba(0,229,255,.8)","--gsh-a":"0 0 6px rgba(0,229,255,.8)","--hsh":"0 0 10px #00e5ff, 0 0 24px rgba(0,229,255,.6)","--tsh":"0 0 8px #00e5ff","--mglow":"0 0 14px rgba(0,229,255,.6), inset 0 0 16px rgba(61,123,255,.3)","--dots":"linear-gradient(rgba(0,229,255,.07) 1px,transparent 1px) 0 0/40px 40px,linear-gradient(90deg,rgba(0,229,255,.07) 1px,transparent 1px) 0 0/40px 40px","--h1color":"#e6fbff"},
+  cols:["#00e5ff","#3d7bff","#00ff9d","#7c4dff","#18ffff","#ffffff"],deco:["🤖","⚙️","💾","📡","🛰️","💻","⚡","🔹"],q:"⚡"};
+function ctry(k,cn,flag,label,tag,b1,b2,line,p,y,m,x,deco){
+  const vars=Object.assign({"--bg1":b1,"--bg2":b2,"--ink":"#2b2230","--card":"#fffdf8","--line":line,"--pink":p,"--yellow":y,"--mint":m,"--sub":"#7a6a68","--dome":"rgba(255,255,255,.6)","--on-yellow":"#2b2230","--on-mint":"#2b2230"},x||{});
+  T[k]={name:flag+" "+cn,cn,icon:flag,label,tag,vars,cols:[p,y,m,line],deco:[flag].concat(deco),q:flag,country:true};
+}
+ctry("TW","台灣","🇹🇼","來呷飯！","🇹🇼 夜市氣氛來了！今天吃台灣味？","#fff0d0","#ffd9d0","#8c1c13","#e8352b","#ffcf33","#ffb347",{"--ink":"#4a1a10","--sub":"#9a5a3a"},["🧋","🏮","🥟","🍜"]);
+ctry("JP","日本","🇯🇵","何食べる？","🇯🇵 日式風味扭蛋，今天來點日本料理？","#f6efe4","#e8dde0","#1f2a44","#c8102e","#e8c468","#8fb996",{"--sub":"#6b6b80"},["🌸","🍣","🍙","🎏"]);
+ctry("KR","韓國","🇰🇷","뭐 먹지?","🇰🇷 韓風登場！今天吃韓國料理？","#e8f1ff","#fde8f1","#1a2a5c","#d62839","#ffd54a","#4c8dff",{"--on-mint":"#ffffff"},["🍢","🌶️","🥢","🍜"]);
+ctry("IT","義大利","🇮🇹","Che si mangia?","🇮🇹 Buon appetito！今天吃義式？","#f1ffe9","#fff0f0","#1e4d2b","#2e9e4f","#ffe27a","#ff6b6b",{},["🍕","🍝","🍷","🧀"]);
+ctry("TH","泰國","🇹🇭","กินอะไรดี","🇹🇭 酸辣開胃！今天吃泰式？","#fff2cc","#e8e6ff","#4a1d5e","#e11d74","#ffc300","#27b5a5",{},["🍤","🥥","🌶️","🐘"]);
+ctry("MX","墨西哥","🇲🇽","¿Qué comemos?","🇲🇽 ¡Fiesta！今天吃墨西哥味？","#ffe8c2","#ffd1e8","#3d1f4d","#e63a8a","#ffc820","#29b97a",{},["🌮","🌶️","🌵","🎉"]);
+ctry("FR","法國","🇫🇷","On mange quoi ?","🇫🇷 Bon appétit！今天來點法式？","#eef2ff","#fff5f7","#23305e","#3b5bdb","#ffd9a0","#e86a7a",{},["🥐","🥖","🧀","🍷"]);
+ctry("IN","印度","🇮🇳","क्या खाएं?","🇮🇳 香料之旅！今天吃印度味？","#ffe9c7","#ffd6e6","#4d1f0a","#f26b1d","#ffcb2f","#2ea36a",{},["🍛","🌶️","🍗","🥘"]);
+ctry("US","美國","🇺🇸","What's for lunch?","🇺🇸 大份量美式！今天吃美國味？","#e8f0ff","#ffe8e8","#1b2a5c","#d92b3a","#ffd23f","#3a6ee8",{"--on-mint":"#ffffff"},["🍔","🍟","🌭","🥤"]);
+ctry("VN","越南","🇻🇳","Ăn gì đây?","🇻🇳 清爽鮮香！今天吃越南味？","#e9ffe6","#fff7d6","#1d3d1f","#da251d","#ffdd33","#4caf50",{},["🍜","🌿","🥖","🍲"]);
+const CKEYS=["TW","JP","KR","IT","TH","MX","FR","IN","US","VN"];
+
+const f={meal:"",price:0,mood:"不限"};
+const $=id=>document.getElementById(id);
+function load(k,d){try{return JSON.parse(localStorage.getItem(k))??d}catch(e){return d}}
+function save(k,v){try{localStorage.setItem(k,JSON.stringify(v))}catch(e){}}
+function ymd(off){const d=new Date();d.setDate(d.getDate()+(off||0));return d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-"+String(d.getDate()).padStart(2,"0")}
+function nowMeal(){const h=new Date().getHours();return h<10?"b":h<15?"l":h<21?"d":"n"}
+f.meal=nowMeal();
+
+let blocked=load("wte_blocked",[]), custom=load("wte_custom",[]), eatLog=load("wte_log",[]);
+let avoidOn=load("wte_avoid",true), cur=null, busy=false;
+let vote=load("wte_vote",null); // {opts:[{n,e}],cnt:[0,0,0]}
+let mode=load("wte_mode","auto"); // auto / world / classic / animal / neon / 國家代碼
+if(mode!=="auto"&&mode!=="world"&&!T[mode])mode="auto";
+let themeKey=null, cols=T.classic.cols;
+$("avoid").checked=avoidOn;
+const rc=()=>cols[Math.floor(Math.random()*cols.length)];
+
+function buildCaps(t){
+  const w=$("caps");w.innerHTML="";
+  for(let i=0;i<16;i++){
+    const d=document.createElement("div");d.className="c";
+    d.style.cssText=`left:${4+Math.random()*152}px;top:${58+Math.random()*80}px;--c:${rc()};--r:${Math.floor(Math.random()*360)}deg;--d:${(Math.random()*.2).toFixed(2)}s`;
+    if(t.animals)d.textContent=ANIMALS[Math.floor(Math.random()*ANIMALS.length)];
+    w.appendChild(d);
+  }
+}
+function buildDeco(t){
+  const w=$("deco");w.innerHTML="";
+  for(let i=0;i<14;i++){
+    const s=document.createElement("span");
+    s.textContent=t.deco[Math.floor(Math.random()*t.deco.length)];
+    s.style.cssText=`left:${Math.random()*95}%;top:${Math.random()*92}%;font-size:${22+Math.random()*26}px;animation-duration:${5+Math.random()*5}s;animation-delay:-${Math.random()*8}s`;
+    w.appendChild(s);
+  }
+}
+function applyTheme(key){
+  const t=T[key];if(!t)return;
+  themeKey=key;
+  const r=document.documentElement.style;
+  for(const k in BASE)r.setProperty(k,BASE[k]);
+  for(const k in t.vars)r.setProperty(k,t.vars[k]);
+  document.body.className="theme-"+key;
+  cols=t.cols;
+  $("title").textContent=t.icon+" 今天吃什麼";
+  $("tag").textContent=t.tag;
+  $("mlabel").textContent=t.label;
+  $("qmark").textContent=t.q;
+  buildCaps(t);buildDeco(t);
+}
+function pickCountry(p){
+  const have=CKEYS.filter(k=>!p||p.some(x=>x.cty===k));
+  const list=have.length?have:CKEYS;
+  const cand=list.filter(k=>k!==themeKey);
+  const arr=cand.length?cand:list;
+  return arr[Math.floor(Math.random()*arr.length)];
+}
+function resolveTheme(p){
+  if(mode==="auto"){
+    if(f.meal==="b")return "animal";
+    if(f.meal==="n")return "neon";
+    if(f.meal==="l"||f.meal==="d")return pickCountry(p);
+    return "classic";
+  }
+  if(mode==="world")return pickCountry(p);
+  return mode;
+}
+function refreshTheme(){if(!busy)applyTheme(resolveTheme())}
+
+/* ---------- 篩選 chips ---------- */
+function chips(el,opts,key){
+  el.innerHTML="";
+  Object.entries(opts).forEach(([v,t])=>{
+    const b=document.createElement("button");b.className="chip";b.textContent=t;b.dataset.v=v;
+    b.onclick=()=>{f[key]=(key==="price"?+v:v);render();if(key==="meal")refreshTheme()};
+    el.appendChild(b)});
+}
+chips($("fMeal"),MEALS,"meal");
+chips($("fPrice"),PRICES,"price");
+chips($("fMood"),Object.fromEntries(MOODS.map(m=>[m,m])),"mood");
+(function(){
+  const el=$("fMode");
+  const opts=[["auto","🎲 自動"],["world","🌏 各國隨機"],["classic","🎰 經典"],["animal","🐻 動物"],["neon","🌙 霓虹"],["tech","🤖 科技"]].concat(CKEYS.map(k=>[k,T[k].name]));
+  opts.forEach(([v,t])=>{
+    const b=document.createElement("button");b.className="chip";b.textContent=t;b.dataset.v=v;
+    b.onclick=()=>{mode=v;save("wte_mode",mode);render();refreshTheme()};
+    el.appendChild(b);
+  });
+})();
+function modeNote(){
+  if(mode==="auto")return "自動：早餐＝可愛動物、午餐／晚餐＝各國風格隨機（料理也跟著換）、宵夜＝霓虹";
+  if(mode==="world")return "各國隨機：每次轉出不同國家的風格與料理";
+  if(T[mode].country)return `已固定「${T[mode].cn}」：只轉出${T[mode].cn}料理（條件下沒有時改抽全部）`;
+  return "已固定風格：不會隨餐別改變";
+}
+
+/* ---------- 避免連吃同類型 ---------- */
+function catDays(c){
+  if(!c)return 0;
+  const days=[ymd(0),ymd(-1),ymd(-2)];
+  return days.filter(d=>eatLog.some(x=>x.d===d&&x.c===c)).length;
+}
+function recentCats(){return [...new Set(FOODS.map(x=>x[5]))].filter(c=>catDays(c)>=2)}
+
+/* ---------- 扭蛋池 ---------- */
+function basePool(){
+  const base=FOODS.filter(([n,e,m,p,mo])=>
+    (!f.meal||m.includes(f.meal))&&(!f.price||p===f.price)&&(f.mood==="不限"||mo.includes(f.mood))
+  ).map(([n,e,m,p,mo,c,cty])=>({n,e,p,mo,c,cty}));
+  const cs=custom.map(n=>({n,e:"⭐",p:0,mo:"",c:"",cty:""}));
+  return base.concat(cs).filter(x=>!blocked.includes(x.n));
+}
+function pool(){
+  const b=basePool();
+  if(!avoidOn)return {p:b,relaxed:false,skipped:[]};
+  const skip=recentCats();
+  const p=b.filter(x=>!skip.includes(x.c));
+  if(p.length)return {p,relaxed:false,skipped:skip.filter(c=>b.some(x=>x.c===c))};
+  return {p:b,relaxed:b.length>0&&skip.length>0,skipped:[]};
+}
+
+/* ---------- 畫面更新 ---------- */
+function render(){
+  document.querySelectorAll("#fMeal .chip").forEach(c=>c.classList.toggle("on",c.dataset.v===f.meal));
+  document.querySelectorAll("#fPrice .chip").forEach(c=>c.classList.toggle("on",+c.dataset.v===f.price));
+  document.querySelectorAll("#fMood .chip").forEach(c=>c.classList.toggle("on",c.dataset.v===f.mood));
+  document.querySelectorAll("#fMode .chip").forEach(c=>c.classList.toggle("on",c.dataset.v===mode));
+  $("modeNote").textContent=modeNote();
+  const h=eatLog.slice(-8).reverse();
+  $("hist").innerHTML=h.length?h.map(x=>`<span class="pill">${x.d.slice(5).replace("-","/")} ${x.n}</span>`).join("")+`<span class="pill"><button data-t="clr" style="margin:0">清除紀錄</button></span>`:'<span class="empty">按「就吃這個」就會記錄在這裡</span>';
+  $("blocked").innerHTML=blocked.length?blocked.map((n,i)=>`<span class="pill">${n}<button data-i="${i}" data-t="b">還原</button></span>`).join(""):'<span class="empty">無</span>';
+  $("custom").innerHTML=custom.map((n,i)=>`<span class="pill">${n}<button data-i="${i}" data-t="c">✕</button></span>`).join("");
+  renderVote();
+}
+function hideActs(){["eat","again","ban","share","map"].forEach(i=>$(i).classList.add("hide"))}
+function showInfo(x,fin){
+  $("name").textContent=x.n;
+  $("meta").textContent=x.p?RAR[x.p]+" · "+PN[x.p]+(x.mo?" · "+x.mo.split(" ").join("／"):"")+(x.c?" · "+x.c:""):"⭐ 我的口袋名單";
+  $("map").href="https://www.google.com/maps/search/"+encodeURIComponent(x.n+" 附近");
+  if(fin)["eat","again","ban","share","map"].forEach(i=>$(i).classList.remove("hide"));
+}
+
+/* ---------- 扭蛋動畫 ---------- */
+function resetCap(hide){
+  const c=$("cap");
+  c.classList.add("noanim");
+  c.classList.remove("open","drop");
+  c.classList.toggle("away",!!hide);
+  c.style.setProperty("--cc",rc());
+  void c.offsetWidth;
+  c.classList.remove("noanim");
+  return c;
+}
+function confetti(){
+  const o=$("out");
+  for(let i=0;i<20;i++){
+    const d=document.createElement("div");d.className="cf";
+    const a=Math.random()*Math.PI*2,r=70+Math.random()*80;
+    d.style.background=rc();
+    d.style.setProperty("--dx",Math.cos(a)*r+"px");
+    d.style.setProperty("--dy",Math.sin(a)*r-20+"px");
+    o.appendChild(d);setTimeout(()=>d.remove(),1000);
+  }
+}
+function dropAndOpen(x,fin,cb){
+  $("emoji").textContent=x.e;
+  $("name").textContent="…";$("meta").textContent="";
+  const c=resetCap(false);
+  void c.offsetWidth;
+  c.classList.add("drop");
+  setTimeout(()=>{c.classList.add("open");confetti();showInfo(x,fin);cb&&cb()},900);
+}
+
+function spin(){
+  if(busy)return;
+  const {p,relaxed,skipped}=pool();
+  if(!p.length){
+    $("emoji").textContent="😵";resetCap(false).classList.add("open");
+    $("name").textContent="沒有符合的選項";$("meta").textContent="放寬一下條件吧";$("note").textContent="";hideActs();return;
+  }
+  busy=true;$("go").disabled=true;hideActs();
+  $("note").textContent="";$("name").textContent="轉啊轉…";$("meta").textContent="";
+
+  // 本次機台風格 + 料理範圍
+  const key=resolveTheme(p);applyTheme(key);
+  const t=T[key];
+  let sp=p;const notes=[];
+  if(t.country){
+    const cp=p.filter(x=>x.cty===key||!x.cty);
+    if(cp.some(x=>x.cty===key)){sp=cp;notes.push(`今日風味：${t.name}料理`)}
+    else notes.push(`目前條件下沒有${t.cn}料理，改從全部選項抽`);
+  }
+  if(relaxed)notes.push("⚠️ 符合條件的選項都是近期吃過的類型，這次先不限制");
+  else if(skipped.length)notes.push("已先跳過近期吃太多的：「"+skipped.join("、")+"」");
+
+  resetCap(true);
+  $("machine").classList.add("spinning");
+  let pick;do{pick=sp[Math.floor(Math.random()*sp.length)]}while(sp.length>1&&cur&&pick.n===cur.n);
+  setTimeout(()=>{
+    $("machine").classList.remove("spinning");
+    dropAndOpen(pick,true,()=>{
+      cur=pick;$("note").textContent=notes.join("　");
+      busy=false;$("go").disabled=false;
+    });
+  },1300);
+}
+$("go").onclick=spin;$("again").onclick=spin;$("knobwrap").onclick=spin;
+$("ban").onclick=()=>{if(!cur||busy)return;if(!blocked.includes(cur.n))blocked.push(cur.n);save("wte_blocked",blocked);render();spin()};
+$("eat").onclick=()=>{
+  if(!cur)return;
+  eatLog.push({d:ymd(0),n:cur.n,c:cur.c||""});eatLog=eatLog.slice(-60);save("wte_log",eatLog);
+  $("note").textContent="已記錄！祝你用餐愉快 😋";$("eat").classList.add("hide");render();
+};
+$("avoid").onchange=e=>{avoidOn=e.target.checked;save("wte_avoid",avoidOn)};
+
+/* ---------- 分享 ---------- */
+async function shareText(text,url){
+  try{
+    if(navigator.share){await navigator.share(url?{text,url}:{text});return "shared"}
+  }catch(e){if(e&&e.name==="AbortError")return "cancel"}
+  const full=url?text+"\n"+url:text;
+  try{await navigator.clipboard.writeText(full);return "copied"}catch(e){}
+  prompt("複製以下文字分享給朋友：",full);return "prompt";
+}
+function toast(el,msg){el.textContent=msg;setTimeout(()=>{if(el.textContent===msg)el.textContent=""},2500)}
+$("share").onclick=async()=>{
+  if(!cur)return;
+  const r=await shareText(`我今天轉到 ${cur.e} ${cur.n}！要不要一起？`);
+  if(r==="copied")toast($("note"),"已複製到剪貼簿");
+};
+
+/* ---------- 揪朋友投票（主辦人） ---------- */
+const canLink=/^https?:/.test(location.protocol);
+function baseUrl(){return location.href.split("#")[0]}
+$("vmake").onclick=()=>{
+  let {p}=pool();
+  if(p.length<2)p=basePool();
+  if(p.length<2){toast($("vres"),"可選項目太少，請放寬篩選");$("vbox").classList.remove("hide");return}
+  const s=[...p].sort(()=>Math.random()-.5).slice(0,3);
+  vote={opts:s.map(x=>({n:x.n,e:x.e})),cnt:s.map(()=>0)};
+  save("wte_vote",vote);$("vres").textContent="";renderVote();
+};
+function renderVote(){
+  if(!vote){$("vbox").classList.add("hide");return}
+  $("vbox").classList.remove("hide");
+  $("vlist").innerHTML=vote.opts.map((o,i)=>`<div class="opt"><span class="on">${i+1}. ${o.e} ${o.n}</span><button class="sq" data-t="vm" data-i="${i}">−</button><span class="cnt">${vote.cnt[i]}</span><button class="sq" data-t="vp" data-i="${i}">＋</button></div>`).join("");
+}
+$("vshare").onclick=async()=>{
+  if(!vote)return;
+  const lines=vote.opts.map((o,i)=>`${i+1}. ${o.e} ${o.n}`).join("\n");
+  const url=canLink?baseUrl()+"#vote="+encodeURIComponent(vote.opts.map(o=>o.e+o.n).join("|")):"";
+  const r=await shareText(`🍽️ 一起吃飯！投票決定吃什麼：\n${lines}\n回覆數字就是你的一票～`,url);
+  if(r==="copied")toast($("vres"),"已複製，貼給朋友吧");
+};
+$("vend").onclick=()=>{
+  if(!vote||busy)return;
+  const mx=Math.max(...vote.cnt);
+  if(mx===0){toast($("vres"),"還沒有人投票喔");return}
+  const win=vote.cnt.map((c,i)=>c===mx?i:-1).filter(i=>i>=0);
+  const i=win[Math.floor(Math.random()*win.length)];
+  const o=vote.opts[i];
+  const found=FOODS.find(x=>x[0]===o.n);
+  const x={n:o.n,e:o.e,p:found?found[3]:0,mo:found?found[4]:"",c:found?found[5]:""};
+  hideActs();$("note").textContent="";
+  $("vres").textContent=win.length>1?`🏆 平手，隨機抽出：${o.e} ${o.n}（${mx} 票）`:`🏆 勝出：${o.e} ${o.n}（${mx} 票）`;
+  $("stage").scrollIntoView({behavior:"smooth",block:"center"});
+  busy=true;
+  dropAndOpen(x,true,()=>{cur=x;busy=false});
+};
+
+/* ---------- 受邀投票（朋友端，需透過網址開啟） ---------- */
+let myVote=null;
+(function initVoter(){
+  const m=location.hash.match(/#vote=(.+)/);if(!m)return;
+  let opts;try{opts=decodeURIComponent(m[1]).split("|").filter(Boolean)}catch(e){return}
+  if(opts.length<2)return;
+  $("voter").classList.remove("hide");
+  $("vopts").innerHTML=opts.map((o,i)=>`<button class="btn vbtn" data-t="pick" data-i="${i}">${i+1}. ${o}</button>`).join("");
+  $("vopts").onclick=e=>{
+    const b=e.target.closest("[data-t=pick]");if(!b)return;
+    myVote=opts[+b.dataset.i];
+    document.querySelectorAll(".vbtn").forEach(x=>x.classList.toggle("sel",x===b));
+    $("vsend").classList.remove("hide");
+    $("vsend").textContent="把我的投票傳回去（"+(+b.dataset.i+1)+"）";
+  };
+  $("vsend").onclick=()=>{if(myVote)shareText(`我投 ${myVote}！（第 ${opts.indexOf(myVote)+1} 個）`)};
+})();
+
+/* ---------- 其他事件 ---------- */
+$("addForm").onsubmit=e=>{e.preventDefault();const v=$("addIn").value.trim();
+  if(v&&!custom.includes(v)){custom.push(v);save("wte_custom",custom)}$("addIn").value="";render()};
+document.addEventListener("click",e=>{
+  const b=e.target.closest("button[data-t]");if(!b)return;
+  const t=b.dataset.t,i=+b.dataset.i;
+  if(t==="b"){blocked.splice(i,1);save("wte_blocked",blocked)}
+  else if(t==="c"){custom.splice(i,1);save("wte_custom",custom)}
+  else if(t==="clr"){eatLog=[];save("wte_log",eatLog)}
+  else if(t==="vp"){vote.cnt[i]++;save("wte_vote",vote)}
+  else if(t==="vm"){vote.cnt[i]=Math.max(0,vote.cnt[i]-1);save("wte_vote",vote)}
+  else return;
+  render()});
+
+applyTheme(resolveTheme());
+resetCap(false);
+render();
+</script>
+</body>
+</html>
